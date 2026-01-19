@@ -74,11 +74,12 @@ def main():
                 return acc_id
 
     # Shared fraud indicators
-    shared_email = "suspicious.user@fakemail.test"
+    shared_email_1 = "suspicious.user@fakemail.test"
+    shared_email_2 = "fraud.ring@notreal.example"
     shared_phone_1 = "555-123-4567"  # Used by 15 of the 20 email-sharing accounts
     shared_phone_2 = "555-987-6543"  # Used by 5 separate accounts
 
-    # Group 1: 20 accounts sharing the same email
+    # Group 1: 20 accounts sharing the same email (shared_email_1)
     # 15 of these also share phone_1, 5 have unique phones
     for i in range(20):
         first_name, last_name = generate_name()
@@ -91,11 +92,22 @@ def main():
             "account_id": unique_account_id(),
             "first_name": first_name,
             "last_name": last_name,
-            "email": shared_email,
+            "email": shared_email_1,
             "phone": phone,
         })
 
-    # Group 2: 5 accounts sharing phone_2 (different email each)
+    # Group 2: 8 accounts sharing a second email (shared_email_2)
+    for _ in range(8):
+        first_name, last_name = generate_name()
+        accounts.append({
+            "account_id": unique_account_id(),
+            "first_name": first_name,
+            "last_name": last_name,
+            "email": shared_email_2,
+            "phone": generate_phone(),
+        })
+
+    # Group 3: 5 accounts sharing phone_2 (different email each)
     for _ in range(5):
         first_name, last_name = generate_name()
         accounts.append({
@@ -106,8 +118,8 @@ def main():
             "phone": shared_phone_2,
         })
 
-    # Group 3: 75 normal accounts (unique emails and phones)
-    for _ in range(75):
+    # Group 4: 67 normal accounts (unique emails and phones)
+    for _ in range(67):
         first_name, last_name = generate_name()
         accounts.append({
             "account_id": unique_account_id(),
@@ -130,10 +142,11 @@ def main():
         writer.writerows(accounts)
 
     print(f"Generated {len(accounts)} accounts to {output_path}")
-    print(f"  - 20 accounts share email: {shared_email}")
+    print(f"  - 20 accounts share email: {shared_email_1}")
     print(f"  - 15 of those also share phone: {shared_phone_1}")
+    print(f"  - 8 accounts share email: {shared_email_2}")
     print(f"  - 5 separate accounts share phone: {shared_phone_2}")
-    print(f"  - 75 normal accounts with unique emails/phones")
+    print(f"  - 67 normal accounts with unique emails/phones")
 
 
 if __name__ == "__main__":
