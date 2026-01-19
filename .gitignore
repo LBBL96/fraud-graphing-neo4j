@@ -136,6 +136,9 @@ celerybeat.pid
 
 # Environments
 .env
+
+# Neo4j local data
+neo4j/
 .envrc
 .venv
 env/
