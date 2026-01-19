@@ -64,3 +64,59 @@ Install the Python driver:
 ```bash
 pip install neo4j
 ```
+
+## Loading Sample Data
+
+The `data/` directory contains sample fraud data with 100 accounts:
+- **20 accounts** share the same email address (`suspicious.user@fakemail.test`)
+- **15 of those** also share the same phone number (`555-123-4567`)
+- **5 additional accounts** share a different phone number (`555-987-6543`)
+- **75 accounts** are "normal" with unique emails and phones
+
+### Generate and Load Data
+
+1. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+2. Generate the CSV data:
+```bash
+python data/seed_data.py
+```
+
+3. Start Neo4j (if not running):
+```bash
+docker compose up -d
+```
+
+4. Load the data into Neo4j:
+```bash
+python load_database.py
+```
+
+### Useful Queries
+
+Find accounts sharing an email:
+```cypher
+MATCH (e:Email)<-[:HAS_EMAIL]-(a:Account)
+WITH e, collect(a) AS accounts
+WHERE size(accounts) > 1
+RETURN e.address AS email, size(accounts) AS account_count, accounts
+```
+
+Find accounts sharing a phone:
+```cypher
+MATCH (p:Phone)<-[:HAS_PHONE]-(a:Account)
+WITH p, collect(a) AS accounts
+WHERE size(accounts) > 1
+RETURN p.number AS phone, size(accounts) AS account_count, accounts
+```
+
+Visualize fraud network (accounts sharing email AND phone):
+```cypher
+MATCH (a:Account)-[:HAS_EMAIL]->(e:Email)<-[:HAS_EMAIL]-(b:Account)
+WHERE a <> b
+MATCH (a)-[:HAS_PHONE]->(p:Phone)<-[:HAS_PHONE]-(b)
+RETURN a, b, e, p
+```
